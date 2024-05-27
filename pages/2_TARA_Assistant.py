@@ -1,0 +1,360 @@
+import streamlit as st
+from streamlit.logger import get_logger
+import pandas as pd
+from adapters.neo4j_adapter import SWNeo4j
+
+import traceback
+from llm.tara_agent import generate_response
+import ast
+import utils
+
+st.set_page_config("TARA Assistant", page_icon=":copilot:",layout="wide")
+
+
+logger = get_logger(__name__)
+
+
+def render_page():
+
+    st.header("TARA Assistant")
+    st.divider()
+    col1, _ = st.columns(2)
+    col1.markdown(
+        """<span style="word-wrap:break-word;">TARA stands for Threat Analysis and Risk Assessment, and it's one of the key components of ISO 21434. 
+        TARA includes several activities that help us identify security threats to road vehicles and develop appropriate protective measures.
+        SystemExpert's TARA Assistant helps you perform those activities efficientily.</span>
+        """, unsafe_allow_html=True
+    )
+    
+    st.subheader("1. Item Definition")
+
+    if "item_defs" not in st.session_state:
+        with st.spinner("Loading item definitions..."):
+            try:
+                neo4j = SWNeo4j()
+                #neo4j.add_attack_graph()
+               
+                st.session_state.item_defs = [
+                    {"item_name":d["item_name"], "item_handle":d['item_handle'], "tara_name":d["tara_name"], "tara_handle":d["tara_handle"]} for d in neo4j.find_item_definitions()
+                ]
+               
+                
+            except Exception as e:
+                st.error(f"Error: {e}\n{traceback.format_exc()}", icon="🚨")
+                return
+    
+    st.markdown("Pleae select an item definition from the list below.")
+    st.session_state.selected_item = get_item()
+    if st.session_state.selected_item:
+        st.subheader("2. Asset Identification")
+
+        if "assets" not in st.session_state:
+
+            with st.spinner("Identifying assets..."):
+
+                try:
+                    neo4j = SWNeo4j()  # cached
+                    tara_handle = st.session_state.selected_item["tara_handle"]
+                    st.session_state.security_properties = [p["p_name"].capitalize() for p in neo4j.find_security_properties(tara_handle)]
+                    
+                    cols = ["Element Name","Is Asset"]
+                    cols.extend(st.session_state.security_properties)
+                    cols.append("Rationale")
+                    
+                    data_df = pd.DataFrame(
+                        columns=cols
+                    )
+                    query_result = [
+                        d
+                        for d in neo4j.find_item_elements(
+                            st.session_state.selected_item["item_name"]
+                        )
+                    ][:1]                    
+                    st.session_state.found_elements = set([r["rel_start"] for r in query_result]+[r["rel_end"] for r in query_result])
+                    
+                    
+                    relations = {f"<Relation source_element={r["rel_start"]} relation_type={r["rel_type"]} target_element={r["rel_end"]}/>" for r in query_result}
+                    
+                    
+                    llm_feedback_str = generate_response(f"Identify assets whithin the following list of elements {st.session_state.found_elements} considering these relations {relations} among them and {st.session_state.security_properties} as security properties")                   
+                    
+                    llm_feedback = ast.literal_eval(llm_feedback_str)["elements"]
+                    for el in llm_feedback:
+                        data_els = [el["name"], el["is_asset"]]
+                        reason_str = "Asset: "+el["asset_reason"]
+                        for p in st.session_state.security_properties:
+                            p_l = p.lower().replace("-","_")                         
+                            data_els.append(el[p_l])
+                            reason_str+="\n"+p+": "+el[p_l+"_reason"]
+                        data_els.append(reason_str)
+                        
+                        data_df.loc[len(data_df.index)] = data_els
+                    st.session_state.assets = data_df
+
+                except Exception as e:
+                    st.error(f"Error: {e}\n{traceback.format_exc()}", icon="🚨")
+                    return
+        st.markdown(
+            "SystemExpert has come up with the following list of assets for the selected item.\nPlease make appropriate adjustments and approve the list to move to the next step."
+        )
+        
+        st.session_state.assets = get_assets()
+        
+        st.session_state.assets_confirmed = st.checkbox("I approve the results and would like to go to the next step.", value="assets_confirmed" in st.session_state and st.session_state.assets_confirmed, key="confirm_assets")
+        if st.session_state.assets_confirmed:
+
+            st.subheader("3. Damage Scenario Specification")
+
+            if "damages" not in st.session_state:
+
+                with st.spinner("Specifying damage scenarios..."):
+
+                    try:
+
+                        neo4j = SWNeo4j()  # cached
+                        data_df = pd.DataFrame(
+                            columns=[
+                                "Asset Name",
+                                "Damage Scenario",
+                                "Safety Impact",
+                                "Privacy Impact",
+                                "Financial Impact",
+                                "Operational Impact",
+                                "Rationale"
+                            ]
+                        )
+
+                        assets = st.session_state.assets
+                        assets = assets[assets["Is Asset"] == True]
+                        assets = assets.loc[:, assets.columns != "Is Asset"].to_json()
+
+                        llm_feedback = generate_response(f"Specify damage scenarios for each of the following assets {assets}.")
+                        
+                        llm_feedback = ast.literal_eval(llm_feedback)["scenarios"]
+                        for el in llm_feedback:
+                            data_df.loc[len(data_df.index)] = [
+                                el["asset_name"],
+                                el["scenario_description"],
+                                el["safety_impact"],
+                                el["privacy_impact"],
+                                el["financial_impact"],
+                                el["operational_impact"],
+                                "Safety: "+el["safety_reason"]+"\nPrivacy: "+el["privacy_reason"]+"\nFinancial: "+el["fin_reason"]+"\nOperational: "+el["op_reason"],
+                            ]
+                        st.session_state.damages = data_df
+
+                    except Exception as e:
+                        st.error(f"Error: {e}\n{traceback.format_exc()}", icon="🚨")
+                        return
+            st.markdown(
+                "SystemExpert has come up with the following list of damage scenarios for the assets.\nPlease make appropriate adjustments and approve the list to move to the next step."
+            )
+            st.session_state.damages = get_damages()
+            st.session_state.damages_confirmed =st.checkbox("I approve the results and would like to go to the next step.", value="damages_confirmed" in st.session_state and st.session_state.damages_confirmed, key="confirm_damages")
+            if st.session_state.damages_confirmed:
+
+                st.subheader("4. Threat Scenario Specification")
+
+                if "threats" not in st.session_state:
+
+                    with st.spinner("Specifying threat scenarios..."):
+
+                        try:
+
+                            neo4j = SWNeo4j()  # cached
+                            data_df = pd.DataFrame(
+                                columns=[
+                                    "Asset Name",
+                                    "Threat Scenario",
+                                    "Affected Properties",
+                                ]
+                            )
+
+                            llm_feedback = generate_response(f"Specify cyber threat scenarios for each of the following assets {st.session_state.assets}.")
+                            
+                            llm_feedback = ast.literal_eval(llm_feedback)["scenarios"]
+                            
+                            for el in llm_feedback:
+                                data_df.loc[len(data_df.index)] = [
+                                    el["asset_name"],
+                                    el["scenario_description"],
+                                    el["affected_properties"]
+                                    
+                                ]
+                            st.session_state.threats = data_df
+
+                        except Exception as e:
+                            st.error(f"Error: {e}\n{traceback.format_exc()}", icon="🚨")
+                            return
+                st.markdown(
+                    "SystemExpert has come up with the following list of threat scenarios for the assets.\nPlease make appropriate adjustments and approve the list to move to the next step."
+                )
+                st.session_state.threats = get_threats()
+                st.session_state.threats_confirmed = st.checkbox("I approve the results and would like to go to the next step.", value="threats_confirmed" in st.session_state and st.session_state.threats_confirmed, key="confirm_threats")
+                if st.session_state.threats_confirmed:
+
+                    st.subheader("5. Attack Path Specification")
+
+                    if "attack_paths" not in st.session_state:
+
+                        with st.spinner("Identifying attack paths..."):
+
+                            try:
+
+                                import time
+
+                                time.sleep(5)
+
+                            except Exception as e:
+                                st.error(
+                                    f"Error: {e}\n{traceback.format_exc()}", icon="🚨"
+                                )
+                                return
+                    st.markdown(
+                        "SystemExpert has come up with the following list of attack paths for the threat scenarios.\nPlease make appropriate adjustments and approve the list to move to the next step."
+                    )
+                    st.session_state.attack_paths = get_attack_paths()
+                    confirm_attack_paths = st.checkbox(
+                        "I approve the results and would like to go to the next step.", value=False, key="confirm_paths"
+                    )
+                    if confirm_attack_paths:
+                        pass
+                    elif "feasibilities" in st.session_state:
+                        del st.session_state.feasibilities
+                elif "attack_paths" in st.session_state:
+                    del st.session_state.attack_paths
+            elif "threats" in st.session_state:
+                del st.session_state.threats
+        elif "damages" in st.session_state:
+            del st.session_state.damages
+        st.divider()
+        
+        utils.save_as_pdf(st.session_state)
+        st.markdown("""
+            <style>
+                div[data-testid="column"] {
+                    width: fit-content !important;
+                    flex: unset;
+                }
+                div[data-testid="column"] * {
+                    width: fit-content !important;
+                }
+            </style>
+            """, unsafe_allow_html=True)
+        col1, col2 = st.columns([1,1])
+        with col1:
+            with open("report.pdf", "rb") as file:
+                st.download_button(label="Save as PDF",file_name="report.pdf", data=file)           
+        with col2:
+            if st.button("Export to SystemWeaver"):
+                
+                st.switch_page("pages/7_SystemWeaver_Data_Exporter.py")
+        
+
+    elif "assets" in st.session_state:
+        del st.session_state.assets
+
+
+def get_attack_paths():
+    pass
+
+
+def get_threats():
+    
+
+   return st.data_editor(
+        st.session_state.threats,
+        column_config={
+            "Asset Name": st.column_config.TextColumn("Asset Name", required=True),
+            "Threat Scenario": st.column_config.TextColumn(
+                "Threat Scenario", required=True
+            ),
+             "Affected Properties": st.column_config.TextColumn(
+                "Affected Properties", required=True
+            ),
+
+        },
+        hide_index=True,
+        # num_rows="dynamic",
+    )
+
+
+def get_damages():
+    
+
+    return st.data_editor(
+        st.session_state.damages,
+        column_config={
+            "Asset Name": st.column_config.TextColumn("Asset Name", required=True),
+            "Damage Scenario": st.column_config.TextColumn(
+                "Damage Scenario", required=True
+            ),
+            "Safety Impact": st.column_config.SelectboxColumn(
+                "Safety Impact", required=True, options = utils.ImpactEnum.list()
+            ),
+            "Privacy Impact": st.column_config.SelectboxColumn(
+                "Privacy Impact", required=True,options = utils.ImpactEnum.list()
+            ),
+            "Financial Impact": st.column_config.SelectboxColumn(
+                "Financial Impact", required=True,options = utils.ImpactEnum.list()
+            ),
+            "Operational Impact": st.column_config.SelectboxColumn(
+                "Operational Impact", required=True, options = utils.ImpactEnum.list()
+            ),
+
+        },
+        hide_index=True,
+        # num_rows="dynamic",
+    )
+
+
+def get_assets():
+    config = { "Element Name": st.column_config.TextColumn(
+                "Element Name", required=True, help="Name of the element"
+            ),
+            "Is Asset": st.column_config.CheckboxColumn(
+                "Is Asset", required=True, help="Is the element an asset"
+            ),
+            "Rationale": st.column_config.TextColumn(
+                "Rationale", required=True, help="Reasons provided by the AI agent"
+            )}
+
+    for sp in st.session_state.security_properties:
+        config[sp]= st.column_config.CheckboxColumn(
+                sp,
+                help="Specify whether "+sp+" is a security property of the asset",
+                default=False,
+            )
+    
+    return st.data_editor(
+        st.session_state.assets,
+        column_config=config,
+        hide_index=True,
+        #num_rows="dynamic",
+    )
+
+def item_changed():
+    if "assets" in st.session_state:
+        #if "selected_item" in st.session_state and option != st.session_state.selected_item["item_name"]:
+        del st.session_state.assets
+        
+
+def get_item():
+        
+    col1,_,_,_ = st.columns(4)
+    with col1:
+        option = st.selectbox(
+            "Available item definitions",
+            [d["item_name"] for d in st.session_state.item_defs],
+            index= st.session_state.item_defs.index(st.session_state.selected_item) if "selected_item" in st.session_state and st.session_state.selected_item else None,
+            placeholder="Select item...",
+            on_change=item_changed
+            
+        )
+        
+        
+    
+    return [df for df in st.session_state.item_defs if df["item_name"] == option][0] if option else None
+
+
+render_page()

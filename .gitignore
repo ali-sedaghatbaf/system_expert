@@ -1,0 +1,5 @@
+.streamlit/
+expertvenv/
+.vscode/
+neo4j_data/
+__pycache__/
