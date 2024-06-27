@@ -4,7 +4,7 @@ import pandas as pd
 from adapters.neo4j_adapter import SWNeo4j
 
 import traceback
-from llm.tara_agent import generate_response
+from llm.tara_agent import TaraAgent
 import ast
 import utils
 
@@ -47,12 +47,13 @@ def render_page():
     st.session_state.selected_item = get_item()
     if st.session_state.selected_item:
         st.subheader("2. Asset Identification")
-
+        tara_agent = TaraAgent()
         if "assets" not in st.session_state:
-
+            
             with st.spinner("Identifying assets..."):
 
                 try:
+                    
                     neo4j = SWNeo4j()  # cached
                     tara_handle = st.session_state.selected_item["tara_handle"]
                     st.session_state.security_properties = [p["p_name"].capitalize() for p in neo4j.find_security_properties(tara_handle)]
@@ -76,7 +77,7 @@ def render_page():
                     relations = {f"<Relation source_element={r["rel_start"]} relation_type={r["rel_type"]} target_element={r["rel_end"]}/>" for r in query_result}
                     
                     
-                    llm_feedback_str = generate_response(f"Identify assets whithin the following list of elements {st.session_state.found_elements} considering these relations {relations} among them and {st.session_state.security_properties} as security properties")                   
+                    llm_feedback_str = tara_agent.generate_response(f"Identify assets whithin the following list of elements {st.session_state.found_elements} considering these relations {relations} among them and {st.session_state.security_properties} as security properties")                   
                     
                     llm_feedback = ast.literal_eval(llm_feedback_str)["elements"]
                     for el in llm_feedback:
@@ -128,7 +129,7 @@ def render_page():
                         assets = assets[assets["Is Asset"] == True]
                         assets = assets.loc[:, assets.columns != "Is Asset"].to_json()
 
-                        llm_feedback = generate_response(f"Specify damage scenarios for each of the following assets {assets}.")
+                        llm_feedback = tara_agent.generate_response(f"Specify damage scenarios for each of the following assets {assets}.")
                         
                         llm_feedback = ast.literal_eval(llm_feedback)["scenarios"]
                         for el in llm_feedback:
@@ -170,7 +171,7 @@ def render_page():
                                 ]
                             )
 
-                            llm_feedback = generate_response(f"Specify cyber threat scenarios for each of the following assets {st.session_state.assets}.")
+                            llm_feedback = tara_agent.generate_response(f"Specify cyber threat scenarios for each of the following assets {st.session_state.assets}.")
                             
                             llm_feedback = ast.literal_eval(llm_feedback)["scenarios"]
                             

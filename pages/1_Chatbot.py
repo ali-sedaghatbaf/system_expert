@@ -1,14 +1,14 @@
 import streamlit as st
 from streamlit.logger import get_logger
 
-from llm.chat_agent import generate_response
+from llm.chat_agent import ChatAgent
 
 logger = get_logger(__name__)
 # tag::setup[]
 # Page Config
-st.set_page_config(page_title="Chatbot", page_icon=":copilot:",layout="wide")
+st.set_page_config(page_title="Chatbot", page_icon=":copilot:", layout="wide")
 # end::setup[]
-
+chat_agent = ChatAgent()
 # tag::session[]
 # Set up Session State
 if "messages" not in st.session_state:
@@ -31,7 +31,7 @@ def write_message(role, content, save=True):
         st.session_state.messages.append({"role": role, "content": content})
 
     # Write to UI
-    
+
     with st.chat_message(role):
         st.markdown(content)
 
@@ -52,7 +52,7 @@ def handle_submit(message):
         # from time import sleep
         # sleep(1)
         # write_message('assistant', message)
-        response = generate_response(message)
+        response = chat_agent.generate_response(message)
         write_message("assistant", response)
 
 

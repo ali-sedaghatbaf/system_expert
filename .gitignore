@@ -1,5 +1,6 @@
 .streamlit/
-expertvenv/
+sysexpetvenv/
 .vscode/
 neo4j_data/
 __pycache__/
+env/

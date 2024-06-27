@@ -1,6 +1,195 @@
 import requests
 
 
-input = {"elements":["Camera ECU", "Gateway ECU"],
-         "security_properties":["Confidentiality", "Integrity"]}
-print(requests.post("http://localhost:8000/asset_identification", params=input).json())
+input_data = {
+    "Parameters": {
+        "SecurityProperties": {
+            "Confidentiality": False,
+            "Integrity": True,
+            "Availability": False,
+            "NonRepudiation": False,
+        }
+    },
+    "Items": [
+        {
+            "Handle": "x04000000000255AA",
+            "Sid": "SI0227",
+            "Type": "Conceptual Architecture",
+            "Ancestor": "x04000000000255AA",
+            "Name": "Collision avoidance system model",
+            "VersionText": None,
+            "VersionNumber": 1,
+            "Status": "I",
+            "Description": {"PlainText": ".....", "Text": ""},
+            "Attributes": [],
+            "PartGroups": [
+                {
+                    "Sid": "SP0327",
+                    "Name": "Included System/Component(s)",
+                    "Parts": [
+                        {
+                            "Handle": "x15000000000255AE",
+                            "Ancestor": "x15000000000255AE",
+                            "Name": "OBD-II connector",
+                            "No": 1,
+                            "DefObj": {"Handle": "x04000000000255AC"},
+                            "Attributes": [],
+                        },
+                        {
+                            "Handle": "x15000000000255B1",
+                            "Ancestor": "x15000000000255B1",
+                            "Name": "Brake system",
+                            "No": 2,
+                            "DefObj": {"Handle": "x04000000000255AF"},
+                            "Attributes": [],
+                        },
+                        {
+                            "Handle": "x15000000000255B4",
+                            "Ancestor": "x15000000000255B4",
+                            "Name": "Camera ECU",
+                            "No": 3,
+                            "DefObj": {"Handle": "x04000000000255B2"},
+                            "Attributes": [],
+                        },
+                        {
+                            "Handle": "x15000000000255B7",
+                            "Ancestor": "x15000000000255B7",
+                            "Name": "Data recorder",
+                            "No": 4,
+                            "DefObj": {"Handle": "x04000000000255B5"},
+                            "Attributes": [],
+                        },
+                    ],
+                },
+                {
+                    "Sid": "SP0333",
+                    "Name": "External System/Component(s)",
+                    "Parts": [
+                        {
+                            "Handle": "x15000000000255AE",
+                            "Ancestor": "x15000000000255AE",
+                            "Name": "Ex OBD-II connector",
+                            "No": 1,
+                            "DefObj": {"Handle": "x04000000000255AC"},
+                            "Attributes": None,
+                        },
+                        {
+                            "Handle": "x15000000000255B1",
+                            "Ancestor": "x15000000000255B1",
+                            "Name": "Ex Brake system",
+                            "No": 2,
+                            "DefObj": {"Handle": "x04000000000255AF"},
+                            "Attributes": None,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            "Handle": "x04000000000255AC",
+            "Sid": "SI0228",
+            "Type": "Conceptual System/Component",
+            "Ancestor": "x04000000000255AC",
+            "Name": "OBD-II connector",
+            "VersionText": None,
+            "VersionNumber": 1,
+            "Status": "I",
+            "Description": {"PlainText": "....", "Text": ""},
+            "Attributes": [
+                {"Sid": "SA0861", "PlainText": "False", "Text": "Controller"},
+                {"Sid": "SA0857", "PlainText": "False", "Text": "Hardware"},
+            ],
+            "PartGroups": None,
+        },
+        {
+            "Handle": "x04000000000255AF",
+            "Sid": "SI0228",
+            "Type": "Conceptual System/Component",
+            "Ancestor": "x04000000000255AF",
+            "Name": "Brake system",
+            "VersionText": None,
+            "VersionNumber": 1,
+            "Status": "I",
+            "Description": {"PlainText": "....", "Text": ""},
+            "Attributes": [
+                {
+                    "Sid": "SA0861",
+                    "PlainText": "False",
+                    "Text": "Input / Sensor",
+                },
+                {"Sid": "SA0857", "PlainText": "False", "Text": "Software"},
+            ],
+            "PartGroups": None,
+        },
+        {
+            "Handle": "x04000000000255B2",
+            "Sid": "SI0228",
+            "Type": "Conceptual System/Component",
+            "Ancestor": "x04000000000255B2",
+            "Name": "Camera ECU",
+            "VersionText": None,
+            "VersionNumber": 1,
+            "Status": "I",
+            "Description": {"PlainText": ".....", "Text": ""},
+            "Attributes": [
+                {"Sid": "SA0857", "PlainText": "False", "Text": "Mixed"},
+                {
+                    "Sid": "SA0861",
+                    "PlainText": "False",
+                    "Text": "Output / Actuator",
+                },
+            ],
+            "PartGroups": None,
+        },
+        {
+            "Handle": "x04000000000255B5",
+            "Sid": "SI0228",
+            "Type": "Conceptual System/Component",
+            "Ancestor": "x04000000000255B5",
+            "Name": "Data recorder",
+            "VersionText": None,
+            "VersionNumber": 1,
+            "Status": "I",
+            "Description": {"PlainText": "....", "Text": ""},
+            "Attributes": [
+                {"Sid": "SA0861", "PlainText": "False", "Text": "Controller"},
+                {"Sid": "SA0857", "PlainText": "False", "Text": "Mixed"},
+            ],
+            "PartGroups": None,
+        },
+        {
+            "Handle": "x04000000000255B5",
+            "Sid": "SI0228",
+            "Type": "Conceptual System/Component",
+            "Ancestor": "x04000000000255B5",
+            "Name": "Ex OBD-II connector",
+            "VersionText": None,
+            "VersionNumber": 1,
+            "Status": "I",
+            "Description": {"PlainText": "....", "Text": ""},
+            "Attributes": [
+                {"Sid": "SA0861", "PlainText": "False", "Text": "Controller"},
+                {"Sid": "SA0857", "PlainText": "False", "Text": "Mixed"},
+            ],
+            "PartGroups": None,
+        },
+        {
+            "Handle": "x04000000000255B5",
+            "Sid": "SI0228",
+            "Type": "Conceptual System/Component",
+            "Ancestor": "x04000000000255B5",
+            "Name": "Ex Brake system",
+            "VersionText": None,
+            "VersionNumber": 1,
+            "Status": "I",
+            "Description": {"PlainText": "....", "Text": ""},
+            "Attributes": [
+                {"Sid": "SA0861", "PlainText": "False", "Text": "Controller"},
+                {"Sid": "SA0857", "PlainText": "False", "Text": "Mixed"},
+            ],
+            "PartGroups": None,
+        },
+    ],
+}
+requests.post("http://localhost:8000/item_definition", json=input_data)
+print(requests.get("http://localhost:8000/asset_identification").json())
