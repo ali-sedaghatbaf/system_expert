@@ -29,16 +29,72 @@
     <tr>
       <td>Power switch actuator</td>
       <td>True</td>
-      <td>False</td>
       <td>True</td>
+      <td>False</td>
       <td>True</td>
     </tr>
+  </tbody>
+</table> </div><h4>3. Threat Scenario Specification</h4><div class='data-desc'><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Asset Name</th>
+      <th>Threat Scenario</th>
+      <th>Affected Properties</th>
+    </tr>
+  </thead>
+  <tbody>
     <tr>
-      <td>Camera CAN</td>
-      <td>False</td>
-      <td>True</td>
-      <td>True</td>
-      <td>True</td>
+      <td>Power switch actuator</td>
+      <td>An attacker gains unauthorized access to the vehicle's internal network and sends malicious commands to the power switch actuator, altering its behavior.</td>
+      <td>Integrity</td>
+    </tr>
+  </tbody>
+</table> </div><h4>4. Impact Analysis</h4><div class='data-desc'><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Asset Name</th>
+      <th>Threat Scenario</th>
+      <th>Damage Scenario</th>
+      <th>Safety Impact</th>
+      <th>Privacy Impact</th>
+      <th>Financial Impact</th>
+      <th>Operational Impact</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Power switch actuator</td>
+      <td>An attacker gains unauthorized access to the vehicle's power switch actuator, compromising its integrity.</td>
+      <td>The attacker disables the power switch actuator, causing the vehicle to lose power while in motion.</td>
+      <td>severe</td>
+      <td>negligible</td>
+      <td>major</td>
+      <td>severe</td>
+    </tr>
+  </tbody>
+</table> </div><h4>5. Attack Path Analysis</h4><div class='data-desc'><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Asset Name</th>
+      <th>Threat Scenario</th>
+      <th>Attack Path</th>
+      <th>Elapsed Time</th>
+      <th>Equipment</th>
+      <th>Knowledge</th>
+      <th>Expertise</th>
+      <th>Window of Opportunity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Power switch actuator</td>
+      <td>An attacker gains unauthorized access to the vehicle's power switch actuator and manipulates its state.</td>
+      <td>1. Gain physical access to the vehicle. 2. Locate the power switch actuator. 3. Use diagnostic tools to interface with the actuator. 4. Manipulate the actuator's state through the diagnostic interface.</td>
+      <td>up to one week</td>
+      <td>specialized</td>
+      <td>restricted information</td>
+      <td>proficient</td>
+      <td>moderate</td>
     </tr>
   </tbody>
 </table> </div>

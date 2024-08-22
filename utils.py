@@ -28,6 +28,57 @@ class ImpactEnum(StrEnum):
     @classmethod
     def list(cls):
         return list(map(lambda c: c.value, cls))
+    
+class ElapsedTimeEnum(StrEnum):
+    ONE_DAY = "up to one day"
+    ONE_WEEK = "up to one week"
+    ONE_MONTH = "up to one month"
+    SIX_MONTHS = "up to six months"
+    ABOVE_SIX_MONTHS = "above six months"
+
+    @classmethod
+    def list(cls):
+        return list(map(lambda c: c.value, cls))
+    
+class ExpertiseEnum(StrEnum):
+    LAYMAN = "layman"
+    PROFICIENT = "proficient"
+    EXPERT = "expert"
+    MULTIPLE_EXPERTS = "multiple experts"
+
+    @classmethod
+    def list(cls):
+        return list(map(lambda c: c.value, cls))
+    
+class KnowledgeEnum(StrEnum):
+    PUBLIC = "public information"
+    RESTRICTED  = "restricted information"
+    CONFIDENTIAL = "confidential information"
+    STRICT = "strictly confidential information"
+
+    @classmethod
+    def list(cls):
+        return list(map(lambda c: c.value, cls))
+    
+class WindowEnum(StrEnum):
+    UNLIMITED = "unlimited"
+    EASY = "easy"
+    MODERATE = "moderate"
+    DIFFICULT = "difficult"
+
+    @classmethod
+    def list(cls):
+        return list(map(lambda c: c.value, cls))
+    
+class EquipmentEnum(StrEnum):
+    STANDARD = "standard"
+    SPECIALIZED = "specialized"
+    BESPOKE = "bespoke"
+    MULTI_BESPOKE = "multiple bespoke"
+
+    @classmethod
+    def list(cls):
+        return list(map(lambda c: c.value, cls))
 
 def section_text(title, data):
     return f"<h4>{title}</h4><div class='data-desc'>{data.to_html(justify="center", index=False)} </div>"
@@ -42,11 +93,16 @@ def save_as_pdf(data):
     item = data.selected_item["item_name"]
 
     report_data = [section_text("2. Asset Identification", data.assets.loc[:, data.assets.columns != "Rationale"])]
-    if "damages" in data:
-        report_data.append(section_text("3. Damage Scenario Specification", data.damages.loc[:, data.damages.columns != "Rationale"]))
-        if "threats" in data:
-            report_data.append(section_text("4. Threat Scenario Specification", data.threats.loc[:, data.threats.columns != "Rationale"]))
-
+    if "threats" in data:
+        report_data.append(section_text("3. Threat Scenario Specification", data.threats.loc[:, data.threats.columns != "Rationale"]))
+        if "damages" in data:
+            report_data.append(section_text("4. Impact Analysis", data.damages.loc[:, data.damages.columns != "Rationale"]))
+            if "attack_paths" in data:
+                report_data.append(section_text("5. Attack Path Analysis", data.attack_paths.loc[:, data.attack_paths.columns != "Rationale"]))
+                if "goals" in data:
+                    report_data.append(section_text("6. Goal Identification", data.goals))
+                    
+        
     report_content = f"""
     <!DOCTYPE html>
         <html lang="en">
@@ -117,7 +173,10 @@ def load_llm(
 ):
     if llm_name == "gpt-4":
         logger.info("LLM: Using GPT-4")
-        return ChatOpenAI(temperature=0, model_name="gpt-4", streaming=True)
+        return ChatOpenAI(temperature=0, model_name=llm_name, streaming=True)
+    elif llm_name == "gpt-4o":
+        logger.info("LLM: Using GPT-4o")
+        return ChatOpenAI(temperature=0, model_name=llm_name, streaming=True)
     elif llm_name == "gpt-3.5":
         logger.info("LLM: Using GPT-3.5")
         return ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", streaming=True)

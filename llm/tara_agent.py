@@ -62,7 +62,7 @@ class TaraAgent:
             ),
             StructuredTool.from_function(
                 name="Damage Scenario Specification",
-                description="Determines potential damage scenarios for a given set of assets. It receives a list of assets and their security properties as input and returns the damage scenarios.",
+                description="Determines potential damage scenarios for a given set of assets. It receives a list of assets and their threat scenarios as input and returns the damage scenarios.",
                 func=damage_chain,
                 return_direct=True,
             ),
@@ -73,13 +73,13 @@ class TaraAgent:
                 return_direct=True,
             ),
             StructuredTool.from_function(
-                name="Attack Path Specification",
-                description="Determines potential attack paths for a given set of threat scenarios. It receives a list of threat scenarios as input and returns the attack paths.",
+                name="Attack Path Analysis",
+                description="Determines potential attack paths for a given set of threat scenarios. It receives a list of assets and their threat scenarios as input and returns the attack paths.",
                 func=attack_path_chain,
                 return_direct=True,
             ),
             StructuredTool.from_function(
-                name="Goal Specification",
+                name="Goal Identification",
                 description="Determines potential goals for improving the cybersecurity of a given set of assets. It receives a list of assets and their foreseen threat scenarios as input and returns the goals.",
                 func=goal_chain,
                 return_direct=True,
@@ -150,7 +150,7 @@ class TaraAgent:
             handle_parsing_errors=True,
             verbose=True,
         ) """
-        self.agent_executor = AgentExecutor(
+        self.agent_executor = AgentExecutor.from_agent_and_tools(
             agent=agent,
             tools=tools,
             memory=memory,
@@ -164,6 +164,6 @@ class TaraAgent:
         and returns a response to be rendered in the UI
         """
 
-        response = self.agent_executor.invoke({"input": prompt})
+        response = self.agent_executor.invoke(dict(input=prompt))
 
         return response["output"]

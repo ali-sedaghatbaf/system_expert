@@ -1,0 +1,3 @@
+2024-08-14 14:50:11.153 CEST [7440] LOG:  database system was shut down at 2024-08-14 14:49:36 CEST
+2024-08-14 14:55:11.151 CEST [7420] LOG:  checkpoint starting: time
+2024-08-14 14:55:11.169 CEST [7420] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.005 s, sync=0.003 s, total=0.020 s; sync files=2, longest=0.002 s, average=0.002 s; distance=0 kB, estimate=0 kB; lsn=0/15FCB60, redo lsn=0/15FCB28

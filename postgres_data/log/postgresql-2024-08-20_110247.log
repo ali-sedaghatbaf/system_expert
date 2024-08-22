@@ -1,0 +1,46 @@
+2024-08-20 11:02:47.072 CEST [7428] LOG:  database system was shut down at 2024-08-20 11:01:43 CEST
+2024-08-20 11:07:47.061 CEST [7992] LOG:  checkpoint starting: time
+2024-08-20 11:07:47.086 CEST [7992] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.006 s, sync=0.003 s, total=0.027 s; sync files=2, longest=0.002 s, average=0.002 s; distance=0 kB, estimate=0 kB; lsn=0/15FCCF8, redo lsn=0/15FCCC0
+2024-08-21 09:05:06.824 CEST [14132] FATAL:  canceling authentication due to timeout
+2024-08-21 09:06:27.025 CEST [11512] FATAL:  canceling authentication due to timeout
+2024-08-21 09:09:24.496 CEST [32200] FATAL:  canceling authentication due to timeout
+2024-08-21 10:58:10.224 CEST [28748] FATAL:  password authentication failed for user "postgres"
+2024-08-21 10:58:10.224 CEST [28748] DETAIL:  Connection matched file "C:/Users/ali.sedaghatbaf/source/system_expert/postgres_data/pg_hba.conf" line 115: "host    all             all             127.0.0.1/32            scram-sha-256"
+2024-08-21 10:58:11.921 CEST [19112] FATAL:  password authentication failed for user "postgres"
+2024-08-21 10:58:11.921 CEST [19112] DETAIL:  Connection matched file "C:/Users/ali.sedaghatbaf/source/system_expert/postgres_data/pg_hba.conf" line 115: "host    all             all             127.0.0.1/32            scram-sha-256"
+2024-08-21 10:59:53.832 CEST [26724] ERROR:  syntax error at or near "6674" at character 31
+2024-08-21 10:59:53.832 CEST [26724] STATEMENT:  create user ali with password 6674;
+2024-08-21 11:01:57.173 CEST [30488] FATAL:  database "Student" does not exist
+2024-08-21 11:01:58.846 CEST [27236] FATAL:  database "Student" does not exist
+2024-08-21 11:02:08.251 CEST [7992] LOG:  checkpoint starting: time
+2024-08-21 11:02:49.317 CEST [26724] ERROR:  syntax error at or near "\" at character 1
+2024-08-21 11:02:49.317 CEST [26724] STATEMENT:  \l
+2024-08-21 11:03:25.480 CEST [26724] ERROR:  syntax error at or near "postgres" at character 1
+2024-08-21 11:03:25.480 CEST [26724] STATEMENT:  postgres=# \l
+2024-08-21 11:03:57.949 CEST [7992] LOG:  checkpoint complete: wrote 982 buffers (6.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=109.586 s, sync=0.096 s, total=109.699 s; sync files=308, longest=0.002 s, average=0.001 s; distance=4563 kB, estimate=4563 kB; lsn=0/1A71BF0, redo lsn=0/1A71BB8
+2024-08-21 11:07:09.013 CEST [7992] LOG:  checkpoint starting: time
+2024-08-21 11:07:14.167 CEST [7992] LOG:  checkpoint complete: wrote 47 buffers (0.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=5.125 s, sync=0.017 s, total=5.155 s; sync files=41, longest=0.002 s, average=0.001 s; distance=157 kB, estimate=4123 kB; lsn=0/1A991E0, redo lsn=0/1A991A8
+2024-08-21 11:38:06.770 CEST [27480] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2024-08-21 11:38:06.775 CEST [32456] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2024-08-21 11:38:06.775 CEST [25388] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2024-08-21 11:38:06.775 CEST [32624] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2024-08-21 11:38:06.776 CEST [25220] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2024-08-21 11:38:06.776 CEST [22220] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2024-08-21 11:38:06.776 CEST [14860] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2024-08-21 11:38:06.778 CEST [21772] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2024-08-21 11:38:06.778 CEST [7632] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2024-08-21 11:38:06.779 CEST [1496] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2024-08-21 11:38:28.133 CEST [26724] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2024-08-21 11:38:28.134 CEST [16324] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	

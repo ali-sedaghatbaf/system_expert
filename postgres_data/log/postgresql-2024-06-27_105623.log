@@ -1,0 +1,16 @@
+2024-06-27 10:56:23.588 CEST [20832] LOG:  database system was shut down at 2024-06-27 10:56:12 CEST
+2024-06-27 11:01:23.651 CEST [32412] LOG:  checkpoint starting: time
+2024-06-27 11:01:31.456 CEST [32412] LOG:  checkpoint complete: wrote 72 buffers (0.4%); 0 WAL file(s) added, 0 removed, 0 recycled; write=7.776 s, sync=0.018 s, total=7.807 s; sync files=32, longest=0.003 s, average=0.001 s; distance=390 kB, estimate=390 kB; lsn=0/15D4848, redo lsn=0/15D4810
+2024-06-28 09:21:30.107 CEST [34552] FATAL:  database "postres" does not exist
+2024-06-28 09:22:13.626 CEST [33796] ERROR:  syntax error at or near "EXIST" at character 30
+2024-06-28 09:22:13.626 CEST [33796] STATEMENT:  
+	        CREATE TABLE IF NOT EXIST Element (
+	            id INT PRIMARY KEY,
+	            name VARCHAR(255),
+	            description TEXT
+	        );
+	        
+2024-06-28 09:27:06.483 CEST [32412] LOG:  checkpoint starting: time
+2024-06-28 09:27:11.215 CEST [32412] LOG:  checkpoint complete: wrote 38 buffers (0.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=4.702 s, sync=0.021 s, total=4.734 s; sync files=36, longest=0.003 s, average=0.001 s; distance=158 kB, estimate=367 kB; lsn=0/15FC3A0, redo lsn=0/15FC368
+2024-06-28 10:23:46.368 CEST [14384] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
